@@ -7,6 +7,10 @@ UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+@app.route('/')
+def index():
+    return "Hello, this is the root endpoint. Use /upload to upload files."
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
