@@ -7,7 +7,8 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-cred = credentials.Certificate("path/to/your/firebase-adminsdk.json")
+# Use the path where Render mounts the secret file
+cred = credentials.Certificate("/etc/secrets/firebase-adminsdk.json")
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'your-project-id.appspot.com'
 })
