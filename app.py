@@ -1,36 +1,32 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_file
+from flask_cors import CORS
+import firebase_admin
+from firebase_admin import credentials, storage
 import os
 
 app = Flask(__name__)
+CORS(app)
 
-UPLOAD_FOLDER = 'uploads'
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+cred = credentials.Certificate("path/to/your/firebase-adminsdk.json")
+firebase_admin.initialize_app(cred, {
+    'storageBucket': 'your-project-id.appspot.com'
+})
 
-@app.route('/')
-def index():
-    return "Hello, this is the root endpoint. Use /upload to upload files and /files to list uploaded files."
+bucket = storage.bucket()
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-
     file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+    blob = bucket.blob(f"uploads/{file.filename}")
+    blob.upload_from_file(file)
+    return jsonify({"message": "File uploaded successfully"}), 200
 
-    file.save(os.path.join(UPLOAD_FOLDER, file.filename))
-    return jsonify({'message': 'File uploaded successfully'}), 200
-
-@app.route('/files', methods=['GET'])
-def list_files():
-    files = os.listdir(UPLOAD_FOLDER)
-    return jsonify({'files': files})
-
-@app.route('/uploads/<filename>', methods=['GET'])
-def get_file(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename)
+@app.route('/download/<filename>', methods=['GET'])
+def download_file(filename):
+    blob = bucket.blob(f"uploads/{filename}")
+    temp_file = f"/tmp/{filename}"
+    blob.download_to_filename(temp_file)
+    return send_file(temp_file, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
