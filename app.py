@@ -10,7 +10,7 @@ CORS(app)
 # Path to your service account key file
 cred = credentials.Certificate('/etc/secrets/firebase-adminsdk.json')
 firebase_admin.initialize_app(cred, {
-    'storageBucket': 'gs://cowboy-storage.appspot.com'
+    'storageBucket': 'cowboy-storage.appspot.com'
 })
 
 bucket = storage.bucket()
