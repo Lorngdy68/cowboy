@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Path to your service account key file
-cred = credentials.Certificate('/etc/secrets/firebase-adminsdk.json')
+cred = credentials.Certificate('/etc/secrets/firebase_adminsdk.json')
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'gs://cowboy-storage.appspot.com'
 })
@@ -31,7 +31,7 @@ def upload_file():
 def download_file(filename):
     blob = bucket.blob(f'uploads/{filename}')
     if not blob.exists():
-            return jsonify({'error': 'File not found'}), 404
+        return jsonify({'error': 'File not found'}), 404
 
     temp_file = f'/tmp/{filename}'
     blob.download_to_filename(temp_file)
