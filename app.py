@@ -10,7 +10,7 @@ CORS(app)
 # Use the path where Render mounts the secret file
 cred = credentials.Certificate("/etc/secrets/firebase-adminsdk.json")
 firebase_admin.initialize_app(cred, {
-    'storageBucket': 'your-project-id.appspot.com'
+    'storageBucket': 'gs://cowboy-storage.appspot.com'
 })
 
 bucket = storage.bucket()
