@@ -7,8 +7,8 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# Use the path where Render mounts the secret file
-cred = credentials.Certificate("/etc/secrets/firebase-adminsdk.json")
+# Path to your service account key file
+cred = credentials.Certificate('path/to/your/firebase_adminsdk.json')
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'gs://cowboy-storage.appspot.com'
 })
@@ -17,15 +17,23 @@ bucket = storage.bucket()
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
     file = request.files['file']
-    blob = bucket.blob(f"uploads/{file.filename}")
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    blob = bucket.blob(f'uploads/{file.filename}')
     blob.upload_from_file(file)
-    return jsonify({"message": "File uploaded successfully"}), 200
+    return jsonify({'message': 'File uploaded successfully'})
 
 @app.route('/download/<filename>', methods=['GET'])
 def download_file(filename):
-    blob = bucket.blob(f"uploads/{filename}")
-    temp_file = f"/tmp/{filename}"
+    blob = bucket.blob(f'uploads/{filename}')
+    if not blob.exists():
+        return jsonify({'error': 'File not found'}), 404
+    
+    temp_file = f'/tmp/{filename}'
     blob.download_to_filename(temp_file)
     return send_file(temp_file, as_attachment=True)
 
