@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Path to your service account key file
-cred = credentials.Certificate('path/to/your/firebase_adminsdk.json')
+cred = credentials.Certificate('/etc/secrets/firebase_adminsdk.json')
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'gs://cowboy-storage.appspot.com'
 })
